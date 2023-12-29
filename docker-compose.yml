@@ -1,0 +1,42 @@
+services:
+  db:
+    image: mysql
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password --port 4306
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_ROOT_PASSWORD: ''
+    ports:
+      - "4306:4306"
+
+
+  web:
+    tty: true 
+    stdin_open: true
+    build: .
+    command:  bash -c "rm -f tmp/pids/server.pid && rails s -b 0.0.0.0"
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_USERNAME: 'root'
+      DATABASE_PORT: '4306'
+      DATABASE_HOST: 'db'
+    volumes:
+      - gems:/usr/local/bundle:delegated
+      - .:/f1
+    depends_on:
+      - db
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+
+volumes:
+  db: {}
+  gems: {}  

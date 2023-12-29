@@ -1,0 +1,15 @@
+%h1 Drivers
+
+%table.auto
+  %thead
+    %tr
+      %th Name
+      %th Wins
+ 
+  %tbody
+    - @drivers.each do |d|
+      %tr
+        %td= link_to "#{d.name} #{d.surname}", "/drivers/#{d.id}"
+        %td= d.wins
+
+%a{:href => "/"} Back
